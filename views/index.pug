@@ -1,28 +1,30 @@
 extends layout 
 
 block content
-    h1 Hello there!
-    h2 #{second_header}
 
+    h1 Welcome to DB Management!
+    p Please login to continue.
+    
+    //- login
     form(action="db_login", method="post") 
-        <div class="container">
-            <label for="hostname"><b>Database Host</b></label>
-            <input type="text" placeholder="Enter Hostname" name="hostname" required>
-            <br>
-
-            <label for="dbname"><b>Database Name</b></label>
-            <input type="text" placeholder="Enter Database Name" name="dbname" required>
-            <br>
-            
-            <label for="username"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="username" required>
-            <br>
-
-            <label for="password"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="password" required>
-        </div>
+        #login-info
+            label Host Name: 
+            input(name='hostname', type='text', required=true, value=hostname)
+        #login-info
+            label Database Name: 
+            input(name='dbname', type='text', required=true, value=dbname)
+        #login-info
+            label Username: 
+            input(name='username', type='text', required=true, value=username)
+        #login-info
+            label Password: 
+            input(name='password', type='password', required=true)
 
         <div class="container">
             <button type="submit">Login</button>
             <button type="reset">Reset</button>
         </div>
+    
+    #login-error
+        if error
+            p.login-error(style={color: 'red'}) #{error}
