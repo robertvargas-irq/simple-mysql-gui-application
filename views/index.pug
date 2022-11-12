@@ -1,0 +1,28 @@
+extends layout 
+
+block content
+    h1 Hello there!
+    h2 #{second_header}
+
+    form(action="db_login", method="post") 
+        <div class="container">
+            <label for="hostname"><b>Database Host</b></label>
+            <input type="text" placeholder="Enter Hostname" name="hostname" required>
+            <br>
+
+            <label for="dbname"><b>Database Name</b></label>
+            <input type="text" placeholder="Enter Database Name" name="dbname" required>
+            <br>
+            
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="username" required>
+            <br>
+
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" required>
+        </div>
+
+        <div class="container">
+            <button type="submit">Login</button>
+            <button type="reset">Reset</button>
+        </div>
