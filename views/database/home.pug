@@ -1,0 +1,18 @@
+block content 
+    link(rel="/css/database/home", href="style.css")
+    h1 #{dbname} Homepage
+    p Logged in as #{username}
+    p
+        I Hosted on #{hostname}
+
+    p 🔍 
+        input(type='text', placeholder='Search by Scheduler Type')
+
+    ul 
+        each d in digitalDisplays 
+            li 
+                h4 Serial No. #{d.serialNo}
+                p Scheduler System: "#{d.schedulerSystem}"
+                p Model Number: #{d.modelNo}
+        else 
+            p No Digital Displays on record.
