@@ -1,0 +1,14 @@
+extends /database/layout 
+
+block content 
+    div(class='info')
+        h1 Model Detailed View
+        hr
+        p Model Number: #{model.modelNo}
+        p Width: #{model.width}
+        p Height: #{model.height}
+        p Weight: #{model.weight}
+        p Depth: #{model.depth}
+        p Screen Size: #{model.screenSize}
+    form(action="/database/home", method="get") 
+        button(type='submit') Go back home
