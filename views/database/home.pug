@@ -10,7 +10,7 @@ block content
 
     p 🔍 
         input(type='text', placeholder='Search by Scheduler Type')
-    form(action="insert/digitaldisplay", method="post") 
+    form(action="insert/digitaldisplay", method="get") 
         button(type="submit") ➕ Create new Digital Display
 
     div(class='actions')
@@ -22,9 +22,9 @@ block content
                         hr
                         p Model Number: 
                             a(class='info', href=`view/model/${d.modelNo}`) #{d.modelNo}
-                        p Scheduler System: "#{d.schedulerSystem}"
+                        p Scheduler System: " #{d.schedulerSystem.toUpperCase()} "
                         div(class='actions')
-                            form(action=`update/digitaldisplay/${d.serialNo}`, method="post") 
+                            form(action=`update/digitaldisplay/${d.serialNo}`, method="get") 
                                 button(type='submit') ✏️ Update
                             form(action=`delete/digitaldisplay/${d.serialNo}`, method="post") 
                                 button(class='delete', type='submit') 🗑️ Delete
