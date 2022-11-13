@@ -87,3 +87,7 @@ a:hover {
     grid-template-columns: 1fr 1fr 1fr;
     margin-bottom: 1em;
 }
+
+.error {
+    color: red
+}
