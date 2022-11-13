@@ -13,7 +13,11 @@ const app = express();
 
 // initialize view engine
 app.set('views', path.join(__dirname, 'views'));
+app.locals.basedir = app.get('views');
 app.set('view engine', 'pug');
+
+// initialize public for CSS
+app.use(express.static(path.join(__dirname, 'public')));
 
 // initialize body parser
 // parse application/x-www-form-urlencoded
@@ -21,9 +25,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 // parse application/json
 app.use(bodyParser.json());
 
-// authentication middle-ware
-// ! NOT USED IN A SECURE MANNER, ONLY FOR DEMONSTRATION PURPOSES
-// initialize session middleware
+/*
+ * Authentication via session middle-ware
+ * ! NOT USED IN A SECURE MANNER, ONLY FOR DEMONSTRATION PURPOSES
+ */
 app.use(sessions({
     secret: "$6v1v=_*vqr2&zldstuf74(xmuj(+mn*&%5oj&8&(=y+y=%5&y",
     saveUninitialized: true,
@@ -38,11 +43,22 @@ app.use('/database', (req, res, next) => {
     next();
 });  
 
+
+/*
+ * ======
+ * Routes
+ * ======
+ * 
+ */
+
+
+
 // homepage route
 app.get('/', (req, res) => {
     res.render('index');
 });
 
+// database dashboard route
 app.get('/database/home', async (req, res) => {
 
     // get connection from session userId
@@ -62,6 +78,54 @@ app.get('/database/home', async (req, res) => {
         username: config.user
     });
 });
+
+// database view model
+app.get('/database/view/model/:modelNo', async (req, res) => {
+    
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+
+    // get requested digital display WITH PREPARED STATEMENT
+    // ! PREPARED
+    const model = (await con.execute(
+        'SELECT * FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
+        [req.params.modelNo] // prepared values
+    ))[0][0]; // select first of resulting rows
+    console.log({model});
+
+    // if model was found, render detailed view
+    if (model) {
+        res.render('database/view/model', { model });
+    }
+    else {
+        res.send(`Unable to locate Model with modelNo ${req.params.modelNo}`);
+    }
+});
+
+
+// delete Digital Display
+app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
+
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+
+    // delete requested digital display WITH PREPARED STATEMENT
+    // ! PREPARED
+    const success = (await con.execute(
+        'DELETE FROM DigitalDisplay WHERE (serialNo = ?)', // prepared values populated in ?
+        [req.params.serialno] // prepared values
+    ));
+    console.log({success});
+    console.log({successat0: success[0]});
+
+    // ! need check for successful deletion
+    res.redirect('/database/home');
+});
+
+
+
 
 // login POST route
 app.post('/db_login', async (req, res) => {
@@ -96,7 +160,7 @@ app.post('/db_login', async (req, res) => {
 });
 
 // logout route
-app.get('/logout', (req, res) => {
+app.post('/db_logout', (req, res) => {
     // destroy session and redirect to the homepage
     req.session.destroy();
     res.redirect('/');
