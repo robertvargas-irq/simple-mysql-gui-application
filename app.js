@@ -68,11 +68,16 @@ app.get('/database/home', async (req, res) => {
     // get DigitalDisplays from connection
     const digitalDisplays = (await con.execute('SELECT * FROM DigitalDisplay'))[0];
     console.log(digitalDisplays);
+
+    // get Models from connection
+    const models = (await con.execute('SELECT * FROM Model'))[0];
+    console.log(models);
     
     // display database homepage
     const config = con.config;
     res.render('database/home', {
         digitalDisplays,
+        models,
         dbname: config.database,
         hostname: config.host,
         username: config.user
@@ -111,16 +116,44 @@ app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
     const userId = req.session.userId;
     const con = db_connections.get(userId);
 
+    // get Digital Display to get associated modelNo
+    // ! PREPARED
+    const display = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (serialNo = ?)', // prepared values populated in ?
+        [req.params.serialno] // prepared values
+    ))[0][0];
+    // if no longer exists, redirect home
+    if (!display) {
+        return res.redirect('/database/home');
+    }
+    const modelNo = display.modelNo;
+
     // delete requested digital display WITH PREPARED STATEMENT
     // ! PREPARED
     const success = (await con.execute(
         'DELETE FROM DigitalDisplay WHERE (serialNo = ?)', // prepared values populated in ?
         [req.params.serialno] // prepared values
-    ));
+    ))[0].affectedRows > 0;
     console.log({success});
-    console.log({successat0: success[0]});
 
-    // ! need check for successful deletion
+    // check to see if modelNo is associated with any DigitalDisplays, or if it may be deleted
+    // ! PREPARED
+    const remainingDisplays = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (modelNo = ?)', // prepared values populated in ?
+        [modelNo] // prepared values
+    ))[0];
+
+    // if no more Displays are of the original modelNo, delete Model
+    if (!remainingDisplays.length) {
+        await con.execute(
+            'DELETE FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
+            [modelNo] // prepared values
+        );
+    }
+
+    
+
+    // redirect home to view results
     res.redirect('/database/home');
 });
 
