@@ -45,6 +45,7 @@ app.use('/database', (req, res, next) => {
 
 
 /*
+ * 
  * ======
  * Routes
  * ======
@@ -158,7 +159,7 @@ app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
 });
 
 // update Digital Display
-app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
+app.get('/database/update/digitaldisplay/:serialno', async (req, res) => {
     
     // get connection from session userId
     const userId = req.session.userId;
@@ -185,8 +186,109 @@ app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
 
 });
 
+// handle incoming data to update Digital Display
+app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+    
+    // prepare objects
+    const originalSerialNo = req.params.serialno;
+    const display = {
+        serialNo: req.body.serialNo,
+        modelNo: req.body.modelNo,
+        schedulerSystem: req.body.schedulerSystem,
+    };
+    const model = {
+        modelNo: req.body.modelNo,
+        width: req.body.width,
+        height: req.body.height,
+        weight: req.body.weight,
+        depth: req.body.depth,
+        screenSize: req.body.screenSize
+    };
+
+
+
+
+    // check if Model exists in the database
+    // ! PREPARED
+    const modelExists = (await con.execute(
+        'SELECT * FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
+        [display.modelNo] // prepared values
+    ))[0].length > 0;
+    
+    // if model does not exist and model information is empty, prompt for Model creation
+    if (!modelExists && (req.body.width === undefined)) {
+        return res.render('database/forms/digitaldisplay', {
+            display, model,
+            createModel: true,
+            updating: true
+        });
+    }
+
+    // get original Display from the database to track changes to the ModelNo
+    const originalDisplay = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (serialNo = ?)', // prepared values populated in ?
+        [originalSerialNo] // prepared values
+    ))[0][0];
+    if (!originalDisplay) {
+        res.redirect('/database/home');
+    }
+
+    // track original model number
+    const originalModelNo = originalDisplay.modelNo;
+
+
+    // perform insertions to the database
+    try {
+        // insert model if needed
+        // ! PREPARED
+        if (req.body.width !== undefined) {
+            await con.execute(
+                'INSERT INTO Model VALUES (?, ?, ?, ?, ?, ?)', // prepared values populated in ?
+                [model.modelNo, model.width, model.height, model.weight, model.depth, model.screenSize] // prepared values
+            );
+        }
+
+        // update digital display
+        // ! PREPARED
+        await con.execute(
+            'UPDATE DigitalDisplay SET serialNo = ?, schedulerSystem = ?, modelNo = ? WHERE (serialNo = ?);', // prepared values populated in ?
+            [display.serialNo, display.schedulerSystem, display.modelNo, originalSerialNo] // prepared values
+        );
+        
+    }
+    catch (e) {
+        return res.render('database/forms/digitaldisplay', {
+            display, model,
+            createModel: !modelExists,
+            error: e || 'Something went wrong, please try again.'
+        });
+    }
+
+    // finally, check to see if modelNo is associated with any DigitalDisplays, or if it may be deleted
+    // ! PREPARED
+    const remainingDisplays = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (modelNo = ?)', // prepared values populated in ?
+        [originalModelNo] // prepared values
+    ))[0];
+
+    // if no more Displays are of the original modelNo, delete Model
+    if (!remainingDisplays.length) {
+        await con.execute(
+            'DELETE FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
+            [originalModelNo] // prepared values
+        );
+    }
+
+
+    // on success, redirect home
+    return res.redirect('/database/home');
+});
+
 // insert Digital Display
-app.post('/database/insert/digitaldisplay', async (req, res) => {
+app.get('/database/insert/digitaldisplay', async (req, res) => {
 
     // render empty form
     res.render('database/forms/digitaldisplay', {
@@ -196,7 +298,76 @@ app.post('/database/insert/digitaldisplay', async (req, res) => {
 
 });
 
+// handle incoming data to insert Digital Display 
+app.post('/database/insert/digitaldisplay', async(req, res) => {
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+    
+    // prepare objects
+    const display = {
+        serialNo: req.body.serialNo,
+        modelNo: req.body.modelNo,
+        schedulerSystem: req.body.schedulerSystem,
+    };
+    const model = {
+        modelNo: req.body.modelNo,
+        width: req.body.width,
+        height: req.body.height,
+        weight: req.body.weight,
+        depth: req.body.depth,
+        screenSize: req.body.screenSize
+    };
 
+
+
+
+    // check if Model exists in the database
+    // ! PREPARED
+    const modelExists = (await con.execute(
+        'SELECT * FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
+        [display.modelNo] // prepared values
+    ))[0].length > 0;
+    
+    // if model does not exist and model information is empty, prompt for Model creation
+    if (!modelExists && (req.body.width === undefined)) {
+        return res.render('database/forms/digitaldisplay', {
+            display, model,
+            createModel: true,
+        });
+    }
+
+    // perform insertions to the database
+    try {
+        // insert model if needed
+        // ! PREPARED
+        if (req.body.width !== undefined) {
+            await con.execute(
+                'INSERT INTO Model VALUES (?, ?, ?, ?, ?, ?)', // prepared values populated in ?
+                [model.modelNo, model.width, model.height, model.weight, model.depth, model.screenSize] // prepared values
+            );
+        }
+
+        // insert digital display
+        // ! PREPARED
+        await con.execute(
+            'INSERT INTO DigitalDisplay VALUES (?, ?, ?)', // prepared values populated in ?
+            [display.serialNo, display.schedulerSystem, display.modelNo] // prepared values
+        );
+        
+    }
+    catch (e) {
+        return res.render('database/forms/digitaldisplay', {
+            display, model,
+            createModel: !modelExists,
+            error: e || 'Something went wrong, please try again.'
+        });
+    }
+
+    // on success, redirect home
+    return res.redirect('/database/home');
+
+});
 
 // login POST route
 app.post('/db_login', async (req, res) => {
