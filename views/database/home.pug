@@ -1,18 +1,30 @@
+extends /database/layout
+
 block content 
-    link(rel="/css/database/home", href="style.css")
     h1 #{dbname} Homepage
-    p Logged in as #{username}
-    p
-        I Hosted on #{hostname}
+    p Logged in as #{username} | Hosted on #{hostname}
+    div(class='logout')
+        form(action="/db_logout", method="post") 
+            button(type='submit') Logout
+    hr
 
     p 🔍 
         input(type='text', placeholder='Search by Scheduler Type')
 
     ul 
         each d in digitalDisplays 
-            li 
-                h4 Serial No. #{d.serialNo}
-                p Scheduler System: "#{d.schedulerSystem}"
-                p Model Number: #{d.modelNo}
+            li(class='info')
+                div
+                    h4 Serial No. #{d.serialNo}
+                    hr
+                    p Model Number: 
+                        a(class='info', href=`view/model/${d.modelNo}`) #{d.modelNo}
+                    p Scheduler System: "#{d.schedulerSystem}"
+                    div(class='actions')
+                        form(action=`update/digitaldisplay/${d.serialNo}`, method="post") 
+                            button(type='submit') ✏️ Update
+                        form(action=`delete/digitaldisplay/${d.serialNo}`, method="post") 
+                            button(class='delete', type='submit') 🗑️ Delete
+                        br
         else 
             p No Digital Displays on record.
