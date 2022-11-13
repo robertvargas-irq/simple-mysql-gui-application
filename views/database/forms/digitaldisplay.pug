@@ -4,28 +4,52 @@ block content
     div(class='info')
         if updating 
             h1 Updating Display with Serial No. #{display.serialNo}
-            form(action="", method="post") 
         else 
-            h1 Inserting New Display with Serial No. #{display.serialNo}
-            form(action="/")
+            h1 Inserting New Display
         hr
-        p Serial No.: 
-            input(type="text", name="serialNo", value=display.serialNo || '')
-        p Model Number: 
-            input(type="text", name="modelNo", value=display.modelNo || '')
-            //- a(class='info', href=`view/model/${display.modelNo}`) #{display.modelNo}
-        p Scheduler System: 
-            input(type="text", name="schedulerSystem", value=display.schedulerSystem || '')
-        div(class='actions')
-            if updating 
-                form(action=`update/digitaldisplay/${display.serialNo}`, method="post") 
-                    button(type='submit') ✅ Confirm Updates
-            else 
-                form(action=`insert/digitaldisplay/${display.serialNo}`, method="post") 
-                    button(type='submit') ✅ Insert
-            form(action="/database/home", method="get") 
-                button(type='submit') Cancel
-    if error
-        p error
+        form(method="post") 
+
+            //- Digital Display form entries
+            div(class='info')
+                p Serial No.: 
+                    input(type="text", name="serialNo", value=display.serialNo || '', required=true)
+                p Model Number: 
+                    input(type="text", name="modelNo", value=display.modelNo || '', readonly=createModel, required=true)
+                p Scheduler System: 
+                    select(name="schedulerSystem") 
+                        option(value="", disabled=true, hidden=true) Select a Scheduler System
+                        option(value="random" selected=display.schedulerSystem == 'random') Random
+                        option(value="smart" selected=display.schedulerSystem == 'smart') Smart
+                        option(value="virtue" selected=display.schedulerSystem == 'virtue') Virtue
+                    //- input(type="text", name="schedulerSystem", value=display.schedulerSystem || '', required=true)
+
+            //- Show create model if needed within the same form
+            if createModel 
+                div(class='info')
+                    h2 Model Number #{display.modelNo} does not exist!
+                    p Please create a new Model to continue.
+                        p Width: 
+                            input(type="text", name="width", value=model.width || '', required=true)
+                        p Height: 
+                            input(type="text", name="height", value=model.height || '', required=true)
+                        p Weight: 
+                            input(type="text", name="weight", value=model.weight || '', required=true)
+                        p Depth: 
+                            input(type="text", name="depth", value=model.depth || '', required=true)
+                        p Screen Size: 
+                            input(type="text", name="screenSize", value=model.screenSize || '', required=true)
+
+            //- Error reporting
+            if error
+                p(class='error') #{error}
+            
+            //- Actions to perform
+            div(class='actions')
+                button(type='submit') ✅ #{updating ? 'Confirm Updates' : 'Insert'} 
+        //- form(action="/database/home", method="get") 
+        //-     button(type='submit') Cancel
+
+
+    
     form(action="/database/home", method="get") 
-        button(type='submit') Go back home
+        button(type='submit') Cancel
