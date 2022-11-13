@@ -1,0 +1,31 @@
+extends /database/layout 
+
+block content 
+    div(class='info')
+        if updating 
+            h1 Updating Display with Serial No. #{display.serialNo}
+            form(action="", method="post") 
+        else 
+            h1 Inserting New Display with Serial No. #{display.serialNo}
+            form(action="/")
+        hr
+        p Serial No.: 
+            input(type="text", name="serialNo", value=display.serialNo || '')
+        p Model Number: 
+            input(type="text", name="modelNo", value=display.modelNo || '')
+            //- a(class='info', href=`view/model/${display.modelNo}`) #{display.modelNo}
+        p Scheduler System: 
+            input(type="text", name="schedulerSystem", value=display.schedulerSystem || '')
+        div(class='actions')
+            if updating 
+                form(action=`update/digitaldisplay/${display.serialNo}`, method="post") 
+                    button(type='submit') ✅ Confirm Updates
+            else 
+                form(action=`insert/digitaldisplay/${display.serialNo}`, method="post") 
+                    button(type='submit') ✅ Insert
+            form(action="/database/home", method="get") 
+                button(type='submit') Cancel
+    if error
+        p error
+    form(action="/database/home", method="get") 
+        button(type='submit') Go back home

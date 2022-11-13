@@ -10,6 +10,8 @@ block content
 
     p 🔍 
         input(type='text', placeholder='Search by Scheduler Type')
+    form(action="insert/digitaldisplay", method="post") 
+        button(type="submit") ➕ Create new Digital Display
 
     ul 
         each d in digitalDisplays 

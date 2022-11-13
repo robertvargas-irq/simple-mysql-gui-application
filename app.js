@@ -124,6 +124,44 @@ app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
     res.redirect('/database/home');
 });
 
+// update Digital Display
+app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
+    
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+
+    // get requested digital display WITH PREPARED STATEMENT
+    // ! PREPARED
+    const display = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (serialNo = ?)', // prepared values populated in ?
+        [req.params.serialno] // prepared values
+    ))[0][0]; // select first of resulting rows
+    console.log({display});
+
+    // if Digital Display was found, render detailed view
+    if (display) {
+        res.render('database/forms/digitaldisplay', {
+            display,
+            updating: true
+        });
+    }
+    else {
+        res.send(`Unable to locate DigitalDisplay with serialNo ${req.params.serialno}`);
+    }
+
+});
+
+// insert Digital Display
+app.post('/database/insert/digitaldisplay', async (req, res) => {
+
+    // render empty form
+    res.render('database/forms/digitaldisplay', {
+        display: {},
+        updating: false,
+    });
+
+});
 
 
 
