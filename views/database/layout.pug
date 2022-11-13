@@ -4,8 +4,12 @@ html
         link(rel="stylesheet", href="/style.css")
         block header
     body 
+        hr
         block content 
         br
         hr
         footer 
+            div(class='logout')
+                form(action="/db_logout", method="post") 
+                    button(type='submit') Logout
             p &copy Robert Vargas, Andres Marques

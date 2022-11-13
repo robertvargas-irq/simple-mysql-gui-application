@@ -1,0 +1,89 @@
+:root {
+    font-family: Arial, sans-serif;
+    --main-bg-color: #0A2239;
+    --main-dark-color: #132E32;
+    --main-light-color: #B8D8BA;
+    --main-light-alt: #53A2BE;
+    --secondary-light-color: #9AADBF;
+}
+
+
+body {
+    color: white;
+    background: var(--main-bg-color);
+}
+
+button {
+    background-color: var(--main-light-color);
+    border: none;
+    border-radius: 12px;
+    color: black;
+    padding: 0.2em 0.4em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+}
+
+button.delete:hover {
+    background-color: red;
+}
+
+button:hover {
+    background-color: white;
+}
+
+.login-form {
+    background-color: var(--main-dark-color);
+    padding: 1em 1em;
+    border-style: solid;
+    border-color: white;
+    border-width: 0.1em;
+    border-radius: 12px;
+    max-width: fit-content;
+}
+
+li.info {
+    list-style: none;
+    background-color: var(--main-dark-color);
+    padding: 0.2rem 0.75em;
+    border-style: solid;
+    border-color: var(--main-light-alt);
+    border-width: 0.2em;
+    border-radius: 12px;
+    margin: 1em -1em;
+    max-width: fit-content;
+}
+
+div.info {
+    list-style: none;
+    background-color: var(--main-dark-color);
+    padding: 0.2rem 0.75em;
+    border-style: solid;
+    border-color: var(--main-light-alt);
+    border-width: 0.2em;
+    border-radius: 12px;
+    margin: 1em 1em;
+    max-width: fit-content;
+}
+
+a {
+    text-decoration: none;
+    background-color: var(--main-light-color);
+    border-style: solid;
+    border-color: var(--main-light-alt);
+    border-width: 0.1em;
+    border-radius: 12px;
+    padding: 0.2em;
+    color: black;
+}
+
+a:hover {
+    background-color: white;
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-bottom: 1em;
+}
