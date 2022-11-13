@@ -13,20 +13,31 @@ block content
     form(action="insert/digitaldisplay", method="post") 
         button(type="submit") ➕ Create new Digital Display
 
-    ul 
-        each d in digitalDisplays 
-            li(class='info')
-                div
-                    h4 Serial No. #{d.serialNo}
-                    hr
-                    p Model Number: 
-                        a(class='info', href=`view/model/${d.modelNo}`) #{d.modelNo}
-                    p Scheduler System: "#{d.schedulerSystem}"
-                    div(class='actions')
-                        form(action=`update/digitaldisplay/${d.serialNo}`, method="post") 
-                            button(type='submit') ✏️ Update
-                        form(action=`delete/digitaldisplay/${d.serialNo}`, method="post") 
-                            button(class='delete', type='submit') 🗑️ Delete
-                        br
-        else 
-            p No Digital Displays on record.
+    div(class='actions')
+        ul 
+            each d in digitalDisplays 
+                li(class='info')
+                    div
+                        h4 Serial No. #{d.serialNo}
+                        hr
+                        p Model Number: 
+                            a(class='info', href=`view/model/${d.modelNo}`) #{d.modelNo}
+                        p Scheduler System: "#{d.schedulerSystem}"
+                        div(class='actions')
+                            form(action=`update/digitaldisplay/${d.serialNo}`, method="post") 
+                                button(type='submit') ✏️ Update
+                            form(action=`delete/digitaldisplay/${d.serialNo}`, method="post") 
+                                button(class='delete', type='submit') 🗑️ Delete
+                            br
+            else 
+                p No Digital Displays on record.
+        p 
+        ul 
+            if models.length 
+                h1 Model Numbers on File
+            each m in models 
+                li(class='info')
+                    div 
+                        p #{m.modelNo}
+            else 
+                p No Models on record.
