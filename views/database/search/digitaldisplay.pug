@@ -1,0 +1,22 @@
+extends /database/layout 
+
+block content 
+    div.info
+        if results.length > 0 
+            h1 Results for search #{schedulerRequested}
+        else 
+            h1 No results found for search #{schedulerRequested}
+        hr
+        each display in results
+            //- Digital Display form entries
+            div.info
+                p Serial No.: #{display.serialNo}
+                p Model Number: #{display.modelNo}
+                p Scheduler System: #{display.schedulerSystem}
+        else 
+            p Nothin' to see here!
+
+
+    
+    form(action="/database/home", method="get") 
+        button(type='submit') Go back home
