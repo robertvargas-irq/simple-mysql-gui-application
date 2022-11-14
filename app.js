@@ -3,7 +3,6 @@ const sessions = require('express-session');
 const path = require('path');
 const PORT = 3000;
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 
 // custom modules
 const db_connections = require('./db_connections');
@@ -367,6 +366,30 @@ app.post('/database/insert/digitaldisplay', async(req, res) => {
     // on success, redirect home
     return res.redirect('/database/home');
 
+});
+
+// search by Scheduler System
+app.get('/database/search/digitaldisplay', async(req, res) => {
+    // get connection from session userId
+    const userId = req.session.userId;
+    const con = db_connections.get(userId);
+    
+    // get search query; redirect to the home page if none was inputted
+    const schedulerRequested = req.query.scheduler;
+    if (!schedulerRequested) res.redirect('/database/home');
+
+    // get all database entries that match the given scheduler
+    // ! PREPARED
+    const results = (await con.execute(
+        'SELECT * FROM DigitalDisplay WHERE (schedulerSystem = ?)', // prepared values populated in ?
+        [schedulerRequested] // prepared values
+    ))[0];
+
+    // render the page with the given results
+    return res.render('database/search/digitaldisplay', {
+        results, schedulerRequested
+    });
+    
 });
 
 // login POST route
