@@ -1,5 +1,8 @@
 extends /database/layout
 
+block header 
+    script(src="home.js") 
+
 block content 
     h1 #{dbname} Homepage
     p Logged in as #{username} | Hosted on #{hostname}
@@ -8,8 +11,14 @@ block content
             button(type='submit') Logout
     hr
 
-    p 🔍 
-        input(type='text', placeholder='Search by Scheduler Type')
+    form(action="search/digitaldisplay", method="get") 
+        select.filter-dropdown#filter(name='scheduler', onchange="toggle_button()") 
+            option(value="") Search by Scheduler System
+            option(value="random") Random
+            option(value="smart") Smart
+            option(value="virtue") Virtue
+        button#filter-submit(type="submit", disabled=true) 🔎 Select an option first
+    
     form(action="insert/digitaldisplay", method="get") 
         button(type="submit") ➕ Create new Digital Display
 

@@ -25,13 +25,21 @@ button {
     font-size: 1rem;
 }
 
+button:hover {
+    background-color: white;
+}
+
+button:disabled {
+    background-color: var(--main-dark-color);
+    border: solid;
+    border-color: var(--secondary-light-color);
+    color: white;
+}
+
 button.delete:hover {
     background-color: red;
 }
 
-button:hover {
-    background-color: white;
-}
 
 .login-form {
     background-color: var(--main-dark-color);
@@ -84,10 +92,24 @@ a:hover {
 
 .actions {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1.2fr 1fr 1fr;
     margin-bottom: 1em;
 }
 
 .error {
     color: red
+}
+
+.search-bar {
+    width: 12rem;
+    height: 1rem;
+    margin-bottom: 1em;
+    margin-right: 0.7em;
+}
+
+.filter-dropdown {
+    width: 14rem;
+    height: 1.8rem;
+    margin-bottom: 1em;
+    margin-right: 0.7em;
 }
