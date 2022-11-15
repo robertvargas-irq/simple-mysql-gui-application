@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 
 // custom modules
 const db_connections = require('./db_connections');
+const db_util = require('./db_util');
 
 // initialize app
 const app = express();
@@ -137,21 +138,7 @@ app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
     console.log({success});
 
     // check to see if modelNo is associated with any DigitalDisplays, or if it may be deleted
-    // ! PREPARED
-    const remainingDisplays = (await con.execute(
-        'SELECT * FROM DigitalDisplay WHERE (modelNo = ?)', // prepared values populated in ?
-        [modelNo] // prepared values
-    ))[0];
-
-    // if no more Displays are of the original modelNo, delete Model
-    if (!remainingDisplays.length) {
-        await con.execute(
-            'DELETE FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
-            [modelNo] // prepared values
-        );
-    }
-
-    
+    await db_util.removeModelIfNotReferenced(con, modelNo);
 
     // redirect home to view results
     res.redirect('/database/home');
@@ -209,13 +196,8 @@ app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
 
 
 
-
     // check if Model exists in the database
-    // ! PREPARED
-    const modelExists = (await con.execute(
-        'SELECT * FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
-        [display.modelNo] // prepared values
-    ))[0].length > 0;
+    const modelExists = await db_util.modelExists(con, display.modelNo);
     
     // if model does not exist and model information is empty, prompt for Model creation
     if (!modelExists && (req.body.width === undefined)) {
@@ -267,20 +249,7 @@ app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
     }
 
     // finally, check to see if modelNo is associated with any DigitalDisplays, or if it may be deleted
-    // ! PREPARED
-    const remainingDisplays = (await con.execute(
-        'SELECT * FROM DigitalDisplay WHERE (modelNo = ?)', // prepared values populated in ?
-        [originalModelNo] // prepared values
-    ))[0];
-
-    // if no more Displays are of the original modelNo, delete Model
-    if (!remainingDisplays.length) {
-        await con.execute(
-            'DELETE FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
-            [originalModelNo] // prepared values
-        );
-    }
-
+    await db_util.removeModelIfNotReferenced(con, originalModelNo);
 
     // on success, redirect home
     return res.redirect('/database/home');
@@ -320,13 +289,9 @@ app.post('/database/insert/digitaldisplay', async(req, res) => {
 
 
 
-
     // check if Model exists in the database
     // ! PREPARED
-    const modelExists = (await con.execute(
-        'SELECT * FROM Model WHERE (modelNo = ?)', // prepared values populated in ?
-        [display.modelNo] // prepared values
-    ))[0].length > 0;
+    const modelExists = await db_util.modelExists(con, display.modelNo);
     
     // if model does not exist and model information is empty, prompt for Model creation
     if (!modelExists && (req.body.width === undefined)) {
