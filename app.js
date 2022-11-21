@@ -86,7 +86,7 @@ app.get('/database/home', async (req, res) => {
     });
 });
 
-// database view model
+// database view detailed Model information
 app.get('/database/view/model/:modelNo', async (req, res) => {
     
     // get connection from session userId
@@ -111,7 +111,7 @@ app.get('/database/view/model/:modelNo', async (req, res) => {
 });
 
 
-// delete Digital Display
+// delete Digital Display from the database
 app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
 
     // get connection from session userId
@@ -145,7 +145,7 @@ app.post('/database/delete/digitaldisplay/:serialno', async (req, res) => {
     res.redirect('/database/home');
 });
 
-// update Digital Display
+// get update Digital Display form page
 app.get('/database/update/digitaldisplay/:serialno', async (req, res) => {
     
     // get connection from session userId
@@ -256,7 +256,7 @@ app.post('/database/update/digitaldisplay/:serialno', async (req, res) => {
     return res.redirect('/database/home');
 });
 
-// insert Digital Display
+// get form to insert Digital Display
 app.get('/database/insert/digitaldisplay', async (req, res) => {
 
     // render empty form
